@@ -1,4 +1,6 @@
+ipython
 click
 black
 pylint
 pytest-cov
+numpy

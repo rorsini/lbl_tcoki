@@ -1,3 +1,4 @@
+ipython
 black
 pylint
 pytest-cov

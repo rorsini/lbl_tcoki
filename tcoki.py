@@ -4,6 +4,8 @@ import numpy as np
 from timeit import timeit
 import uuid
 import logging
+import matplotlib.pyplot as plt
+import pandas as pd
 
 #logging.basicConfig(level=logging.INFO)
 
@@ -13,7 +15,7 @@ class Tcoki:
         # create a dict of {size}:
         self.d = {}
         logging.debug(f"making a dict of size {size}")
-        for n in range(1, size, 10):
+        for n in range(size):
             key = uuid.uuid4()
             value = "v:" + str(key)
             if key not in self.d.keys():
@@ -35,32 +37,39 @@ class Tcoki:
         return f"size: {len(self.d.keys())} {key}: {self.d[key]}"
 
 
-sd, td = [], []
+###########################
 
+res, td = [], []
 num_tests = 0
-for size in range(1, 10000, 10):
+
+for size in range(10000, 100000):
 
     d = Tcoki(size)
     logging.info(f"dict size: {d.getLen()}")
 
     # profile 100 inserts:
     g = globals()
-    t = timeit("d.insertKey()", globals=g, number=100)
+    t = timeit("d.insertKey()", globals=g, number=10)
     
-    sd.append(size)
     td.append(t)
-    print(t)
+    res.append([size,t])
+    print('{:f}'.format(t), size)
     num_tests += 1
 
 
 print(f"total tests run: {num_tests}")
 
-
 stdt = np.std(td)
-print(f"std of time is: {stdt}")
+print(f"std of time is: " + '{:f}'.format(stdt))
 
-stds = np.std(sd)
-print(f"std of size is: {stds}")
+#####################################
 
+data = np.array(res)
+dataset = pd.DataFrame({'Size': data[:, 0], 'Time': data[:, 1]})
 
-
+tcoki_data = dataset
+tcoki_data = tcoki_data[tcoki_data['Size'].notnull()]
+tcoki_data['Time'] = tcoki_data['Time'].fillna(tcoki_data['Time'].mean())
+tcoki_data = tcoki_data.drop_duplicates()
+plt.scatter(tcoki_data['Size'], tcoki_data['Time'])
+plt.show()

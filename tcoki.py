@@ -69,8 +69,7 @@ def profileTcoki(start=1, end=1000):
     tcoki_data['Time'] = tcoki_data['Time'].fillna(tcoki_data['Time'].mean())
     tcoki_data = tcoki_data.drop_duplicates()
     plt.scatter(tcoki_data['Size'], tcoki_data['Time'])
-    #plt.show()
-    plt.savefig(f"./plot-{end}.png")
+    plt.savefig(f"./images/plot-{end}.png")
 
     return {
         'dict size': [start, end],
@@ -79,7 +78,7 @@ def profileTcoki(start=1, end=1000):
     }
 
 
-# Run profile buckets:
+# Run five profile buckets:
 for size in range(1, 5000, 1000):
     print(profileTcoki(start=size, end=size+1000))
 

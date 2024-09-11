@@ -14,5 +14,5 @@ x = [1000,2000,3000,4000,5000]
 e = [.1,.2,.3,.4,.5] 
 
 plt.errorbar(x, y, e, linestyle='None', ecolor='red', marker='^', capsize=3)
-plt.savefig(f"./mean_std_error_alt.png")
+plt.savefig(f"./images/mean_std_error_alt.png")
 

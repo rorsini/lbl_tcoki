@@ -1,9 +1,13 @@
 import numpy as np
 from timeit import timeit
-from datetime import datetime
+import time
 import uuid
 import matplotlib.pyplot as plt
 import pandas as pd
+from numpy import array
+import pprint
+
+pp = pprint.PrettyPrinter(indent=4)
 
 class Tcoki:
 
@@ -36,23 +40,31 @@ class Tcoki:
         return True
 
 
-def profileTcoki(datafile, start, end):
+def profileTcokiBucket(datafile, start, end):
 
-    res, td = [], []
+    size_time_data = []
     num_tests = 0
 
     for size in range(start, end):
 
         d = Tcoki(datafile, size)
-        t = timeit("d.insertKey()", globals=locals(), number=10)
+        t = timeit("d.insertKey()", globals=locals(), number=1)
         
-        td.append(t)
-        res.append([size,t])
+        size_time_data.append([size,t])
         num_tests += 1
 
-    stdt = np.std(td)
-    data = np.array(res)
-    mean = np.mean(res, axis=0, dtype=np.float64)
+
+    size_data = [x[0] for x in size_time_data]
+    time_data = [x[1] for x in size_time_data]
+
+    # timestamp
+    timestamp = int(time.time())
+
+    # standard deviation (time)
+    std_time = np.std(time_data)
+
+    data = np.array(size_time_data)
+    mean_time = np.mean(time_data, axis=0, dtype=np.float64)
     dataset = pd.DataFrame({'Size': data[:, 0], 'Time': data[:, 1]})
 
     tcoki_data = dataset
@@ -60,22 +72,49 @@ def profileTcoki(datafile, start, end):
     tcoki_data['Time'] = tcoki_data['Time'].fillna(tcoki_data['Time'].mean())
     tcoki_data = tcoki_data.drop_duplicates()
 
-    now = datetime.now()
-    today = now.strftime("%Y-%m-%d")
-    date = str(now)
-
+    #fig1, ax1 = plt.subplots()
+    #plt.settitle('insertKey() timeit results')
     plt.scatter(tcoki_data['Size'], tcoki_data['Time'])
-    plt.show()
-    #plt.savefig(f"./images/{today}/plot-{end}.png")
+    #plt.show()
+    plt.savefig(f"./images/{timestamp}_plot-{end}.png")
 
     data = {
-        'size': [start, end],
-        'std': stdt,
-        'mean': mean,
+        'size_range': [start, end],
+        'mean_time': mean_time,
+        'std_time':  std_time,
     }
 
-    with open(f"./data/{today}/output.log", "a") as file:
-        file.write(f"{date} | {data}\n")
+    with open(f"./logs/{timestamp}.log", "a") as file:
+        file.write(f"{data}\n")
+
+    return data
+
+
+def profileTcoki(inData=None):
+
+    data = []
+    if not inData:
+        data.append(profileTcokiBucket('./data/uuids.csv', 1, 10))
+        data.append(profileTcokiBucket('./data/uuids.csv', 10, 100))
+        data.append(profileTcokiBucket('./data/uuids.csv', 100, 1000))
+        data.append(profileTcokiBucket('./data/uuids.csv', 1000, 10000))
+        data.append(profileTcokiBucket('./data/uuids.csv', 10000, 100000))
+    else:
+        data = inData
+
+    x = [d['size_range'][1] for d in data]
+    y = [d['mean_time'] for d in data]
+    e = [d['std_time'] for d in data]
+
+    print(x)
+    print(y)
+    print(e)
+
+    fig2, ax2 = plt.subplots()
+    ax2.set_title('mean and std results')
+    ax2.errorbar(x, y, yerr=e, linestyle='None', ecolor='red', marker='^', capsize=3)
+    #ax2.show()
+    fig2.savefig(f"./images/mean_std_error_alt.png")
 
     return data
 

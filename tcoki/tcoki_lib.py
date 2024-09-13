@@ -5,9 +5,11 @@ import uuid
 import matplotlib.pyplot as plt
 import pandas as pd
 from numpy import array
+import datetime
 import pprint
 
 pp = pprint.PrettyPrinter(indent=4)
+DATE_STR = datetime.date.today()
 
 class Tcoki:
 
@@ -72,11 +74,9 @@ def profileTcokiBucket(datafile, start, end):
     tcoki_data['Time'] = tcoki_data['Time'].fillna(tcoki_data['Time'].mean())
     tcoki_data = tcoki_data.drop_duplicates()
 
-    #fig1, ax1 = plt.subplots()
-    #plt.settitle('insertKey() timeit results')
     plt.scatter(tcoki_data['Size'], tcoki_data['Time'])
     #plt.show()
-    plt.savefig(f"./images/{timestamp}_plot-{end}.png")
+    plt.savefig(f"./images/{DATE_STR}/scatter-{start}-{end}.png")
 
     data = {
         'size_range': [start, end],
@@ -84,7 +84,7 @@ def profileTcokiBucket(datafile, start, end):
         'std_time':  std_time,
     }
 
-    with open(f"./logs/{timestamp}.log", "a") as file:
+    with open(f"./logs/{DATE_STR}/logfile.txt", "a") as file:
         file.write(f"{data}\n")
 
     return data
@@ -97,18 +97,14 @@ def profileTcoki(inData=None):
         data.append(profileTcokiBucket('./data/uuids.csv', 1, 10))
         data.append(profileTcokiBucket('./data/uuids.csv', 10, 100))
         data.append(profileTcokiBucket('./data/uuids.csv', 100, 1000))
-        data.append(profileTcokiBucket('./data/uuids.csv', 1000, 10000))
-        data.append(profileTcokiBucket('./data/uuids.csv', 10000, 100000))
+        #data.append(profileTcokiBucket('./data/uuids.csv', 1000, 10000))
+        #data.append(profileTcokiBucket('./data/uuids.csv', 10000, 100000))
     else:
         data = inData
 
     x = [d['size_range'][1] for d in data]
     y = [d['mean_time'] for d in data]
     e = [d['std_time'] for d in data]
-
-    print(x)
-    print(y)
-    print(e)
 
     fig2, ax2 = plt.subplots()
     ax2.set_title('mean and std results')

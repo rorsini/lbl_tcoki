@@ -1,2 +1,0 @@
-{'size_range': [1, 10], 'mean_time': np.float64(2.005435008969572e-05), 'std_time': np.float64(8.672890486412335e-06)}
-{'size_range': [10, 100], 'mean_time': np.float64(1.650676131248474e-05), 'std_time': np.float64(1.9558041532377834e-06)}

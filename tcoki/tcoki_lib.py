@@ -97,23 +97,22 @@ def profileTcokiBucket(timestamp, start, end):
     return data
 
 
-def profileTcoki(inData=None):
+def profileTcoki(data=None):
 
     ts = time.time()
 
-    data = []
-    if not inData:
-        data.append(profileTcokiBucket(ts, 1, 10))
-        data.append(profileTcokiBucket(ts, 10, 100))
-        data.append(profileTcokiBucket(ts, 100, 1000))
-        #data.append(profileTcokiBucket(ts, 1000, 10000))
-        #data.append(profileTcokiBucket(ts, 10000, 100000))
+    output = []
+    if data:
+        for r in data:
+            start = r[0]
+            end = r[1]
+            output.append(profileTcokiBucket(ts, start, end))
     else:
-        data = inData
+        return
 
-    x = [d['size_range'][1] for d in data]
-    y = [d['mean_time'] for d in data]
-    e = [d['std_time'] for d in data]
+    x = [d['size_range'][1] for d in output]
+    y = [d['mean_time'] for d in output]
+    e = [d['std_time'] for d in output]
 
     fig2, ax2 = plt.subplots()
     ax2.set_title('mean and std results')
@@ -121,5 +120,5 @@ def profileTcoki(inData=None):
     #ax2.show()
     fig2.savefig(f"./output/images/{DATE_STR}/{ts}_mean_std_error_alt.png")
 
-    return data
+    return output
 

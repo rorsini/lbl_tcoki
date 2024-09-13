@@ -5,3 +5,4 @@ pytest-cov
 numpy
 matplotlib
 pandas
+click
